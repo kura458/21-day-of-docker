@@ -1,81 +1,117 @@
-# Day 21 – Full Stack Application Deployment with Docker 
+# Day 21 – Full-Stack Todo Application with Docker Compose
 
+This folder contains a containerized Todo application used to practice a multi-service Docker deployment.
 
+## Architecture
 
-## Project Overview
-This project demonstrates a **production-ready full-stack application** integrating:  
+| Service | Technology | Purpose | Local address |
+|---|---|---|---|
+| `frontend` | React, TypeScript, Vite | Todo interface | http://localhost:3000 |
+| `backend` | FastAPI, SQLAlchemy | REST API and application logic | http://localhost:8000 |
+| `db` | PostgreSQL 15 | Persistent Todo storage | Internal Compose network |
 
-- **Frontend:** React for UI with state management  
-- **Backend:** FastAPI for RESTful APIs  
-- **Database:** PostgreSQL for persistent storage  
+The frontend uses Zustand for state management and Axios for API requests. The backend exposes Todo endpoints under `/todos` and a health endpoint at `/health`.
 
-**Purpose:**  
-- Show how **frontend and backend communicate** in a real-world app  
-- Demonstrate **Docker + Docker Compose** in a production-like workflow  
-- Practice **secure, scalable, and maintainable architecture**  
+## Project structure
+
+```text
+21-full-application-deployment/
+├── backend/
+│   ├── app/
+│   │   ├── routers/
+│   │   ├── crud.py
+│   │   ├── database.py
+│   │   ├── main.py
+│   │   ├── models.py
+│   │   ├── schemas.py
+│   │   └── services.py
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── vite.config.ts
+├── .dockerignore
+├── .gitignore
+├── docker-compose.yml
+└── README.md
+```
+
+## Requirements
+
+- Docker Desktop with Docker Compose v2, or Docker Engine with the Compose plugin
+- Git
+
+## Run the application
+
+Open a terminal in this directory:
+
+```bash
+cd 21-full-application-deployment
+```
+
+Create your local environment file.
+
+**Windows CMD:**
+
+```cmd
+copy .env.example .env
+```
+
+**PowerShell, macOS, or Linux:**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set a private local database password. The example value is only a placeholder for local learning; do not reuse it in a public or production deployment.
+
+Build and start all services:
+
+```bash
+docker compose up --build -d
+```
+
+Check service status and logs:
+
+```bash
+docker compose ps
+docker compose logs -f
+```
+
+Open the frontend at [http://localhost:3000](http://localhost:3000). The backend API documentation is available at [http://localhost:8000/docs](http://localhost:8000/docs), and its health endpoint is [http://localhost:8000/health](http://localhost:8000/health).
+
+Stop the services:
+
+```bash
+docker compose down
+```
+
+The named `db_data` volume preserves PostgreSQL data when containers are stopped or recreated. To remove the database data as well, use `docker compose down -v` (this permanently deletes the local database volume).
+
+## Configuration notes
+
+- Compose reads the root `.env` file for PostgreSQL settings and the frontend API URL.
+- The backend receives its database connection string from the Compose service environment and connects to the database using the service name `db`, not `localhost`.
+- PostgreSQL has a health check. The backend waits until the database is ready, and the frontend waits until the backend health check succeeds.
+- `VITE_API_BASE_URL` is embedded into the frontend at image build time. Rebuild the frontend image after changing it.
+- The default API URL is intended for a local browser accessing the application on the same machine.
+
+## Learning points
+
+- Defining frontend, backend, and database services in Compose
+- Building images from separate Dockerfiles
+- Connecting services over a private Compose network
+- Supplying configuration through environment variables
+- Using health checks and service readiness conditions
+- Persisting database data with a named volume
+- Running the application containers as a non-root user where configured
+
+## Scope and limitations
+
+This is an educational deployment example, not a production-hardened service. Before production use, add stronger secret management, database backups, TLS termination, migrations, monitoring, and an appropriate deployment security review.
 
 ---
 
-## Architecture & Features
-
-- **Frontend:** React app (with modular components and state management)  
-- **Backend:** FastAPI app structured with:
-  - `models/` – Database schemas  
-  - `controllers/` – API route logic  
-  - `services/` – Business logic and database interaction  
-- **Database:** PostgreSQL with persistent volumes  
-- **Docker Setup:**
-  - Multi-stage Dockerfile for build and runtime efficiency  
-  - `.dockerignore` to exclude unnecessary files  
-  - Environment variables stored in `.env` (never committed)  
-  - Non-root user for security  
-  - Caching dependencies for faster builds  
-- **Docker Compose:**  
-  - Define services (`frontend`, `backend`, `db`)  
-  - Setup volumes and networks automatically  
-  - Manage container startup order and dependencies  
-- **Production Practices:**  
-  - Secure container configuration (USER, WORKDIR)  
-  - Port mapping and networking  
-  - Persistent volumes for database and app data  
-  - Debugging and troubleshooting dependencies  
-
----
-
-## Lessons Learned from Day 1–20
-
-By completing this journey, you have learned:  
-
-1. **Docker Basics:** Containers, images, and Dockerfile fundamentals  
-2. **Image Optimization:** Multi-stage builds, caching, `.dockerignore`  
-3. **Container Security:** Non-root users, environment variables, minimal permissions  
-4. **Docker Networking:** Service-to-service communication and isolated networks  
-5. **Volumes & Persistence:** Keeping data across container restarts  
-6. **Docker Compose:** Multi-container orchestration, dependency management, startup order  
-7. **Backend Practices:** FastAPI structure with models, services, and controllers  
-8. **Frontend Integration:** React + Zustand for state management, API consumption  
-9. **Database Handling:** PostgreSQL setup with Docker volumes  
-10. **Debugging & Troubleshooting:** Logs, health checks, startup issues, port conflicts  
-11. **Production Readiness:** Full-stack app deployment, modular structure, and maintainable design  
-
----
-
-## Congratulations! 🎉
-
-**You have completed the Docker Full-Stack Learning Journey!**  
-
-This journey has taken you from **Day 1 basic Docker concepts** to **Day 21 full-stack production practices**, covering:  
-
-- Containers, images, Dockerfiles, and multi-stage builds  
-- Volumes, networks, and persistent storage  
-- Docker Compose orchestration and dependency handling  
-- Secure environment configuration and best practices  
-- Integrating frontend and backend for real-world apps  
-
-<img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/675b859f-2f59-4a56-b143-2474d3e1d44b" />
-
-
----
-
-## Navigation
-[⬅ Previous: Day 20 Docker Compose](../20-docker-compose/) | [🏁 End of Docker Journal](../README.md)
+Part of the [21-day Docker learning journal](../README.md).
