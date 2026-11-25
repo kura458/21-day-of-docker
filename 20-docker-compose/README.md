@@ -166,3 +166,30 @@ docker compose logs
 ---
 
 [⬅ Previous: Day 19 Multistage Builds](../19-multistage-builds/) | [Next ➡ Day 21 full-stack deployement](../21-full-application-deployment/)
+
+
+## Run the FastAPI Compose example
+
+The Compose file loads variables from `web_app/.env`. The real `.env` file is intentionally not tracked.
+
+From the `20-docker-compose/web_app` directory, create your local environment file:
+
+**Windows CMD:**
+```cmd
+copy .env.example .env
+```
+
+**PowerShell, macOS, or Linux:**
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and replace `SECRET_KEY` with a private random value before using the application beyond a local demonstration. Keep `.env` private and never commit it.
+
+Then, from the same directory, start the service:
+
+```bash
+docker compose up --build
+```
+
+Open [http://localhost:8000](http://localhost:8000) to check the API. Stop the service with `docker compose down`.
